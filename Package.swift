@@ -20,6 +20,5 @@ let package = Package(
         .testTarget(
             name: "MiniNeTests",
             dependencies: ["MiniNe"]),
-    ],
-    exclude: ["Tests"]
+    ]
 )
