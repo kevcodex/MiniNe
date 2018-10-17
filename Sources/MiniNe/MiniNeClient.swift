@@ -51,5 +51,10 @@ public class MiniNeClient {
         task.resume()
     }
     
+    /// Cancels all outstanding tasks and then invalidates the URLSession.
+    public func invalidateAndCancel() {
+        session.invalidateAndCancel()
+    }
+    
     public init() { }
 }
