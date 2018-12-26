@@ -24,6 +24,7 @@ public protocol NetworkRequest {
     var method: HTTPMethod { get }
     var parameters: [String: Any]? { get }
     var headers: [String: Any]? { get }
+    var body: NetworkBody? { get }
 }
 
 public extension NetworkRequest {
@@ -43,6 +44,8 @@ public extension NetworkRequest {
         addQueryParameters(parameters, to: &urlRequest)
         
         addHeaders(headers, to: &urlRequest)
+        
+        addRequestBody(body, to: &urlRequest)
         
         return urlRequest
     }
@@ -83,5 +86,26 @@ private extension NetworkRequest {
         }
         
         headers.forEach { request.setValue(String(describing: $0.value), forHTTPHeaderField: $0.key) }
+    }
+    
+    func addRequestBody(_ body: NetworkBody?, to request: inout URLRequest) {
+        guard let body = body else {
+            return
+        }
+        
+        switch body.encoding {
+            
+        case .json:
+            do {
+                let data = try JSONSerialization.data(withJSONObject: body.parameters, options: [])
+                
+                request.setValue(body.encoding.contentTypeValue, forHTTPHeaderField: "Content-Type")
+                request.httpBody = data
+                
+            } catch {
+                // Handle errors better
+                print(error)
+            }
+        }
     }
 }
