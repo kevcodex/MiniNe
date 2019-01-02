@@ -25,6 +25,7 @@ public protocol NetworkRequest {
     var parameters: [String: Any]? { get }
     var headers: [String: Any]? { get }
     var body: NetworkBody? { get }
+    var acceptableStatusCodes: [Int] { get }
 }
 
 public extension NetworkRequest {
@@ -52,6 +53,10 @@ public extension NetworkRequest {
     
     func response(from data: Data, urlResponse: HTTPURLResponse) -> Response {
         return Response(statusCode: urlResponse.statusCode, data: data)
+    }
+    
+    var acceptableStatusCodes: [Int] {
+        return Array(200..<300)
     }
 }
 

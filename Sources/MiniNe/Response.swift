@@ -10,3 +10,9 @@ public class Response {
         self.data = data
     }
 }
+
+public extension Response {
+    func isValid(statusCodes: [Int]) -> Bool {
+        return statusCodes.contains(statusCode)
+    }
+}

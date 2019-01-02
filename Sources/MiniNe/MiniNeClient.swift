@@ -35,11 +35,17 @@ public class MiniNeClient {
             case let (data?, response?, _):
                 
                 guard let urlResponse = response as? HTTPURLResponse else {
-                    completion(Result(error: .badRequest(message: "Bad HTTPURL Request")))
+                    completion(Result(error: .badRequest(message: "Bad HTTP URL Request")))
                     return
                 }
                 
                 let response = request.response(from: data, urlResponse: urlResponse)
+                
+                guard response.isValid(statusCodes: request.acceptableStatusCodes) else {
+                    completion(Result(error: .responseValidationFailed(message: "Invalid Status Code: \(response.statusCode)")))
+                    return
+                }
+                
                 completion(Result(value: response))
                 
             default:

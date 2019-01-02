@@ -11,6 +11,8 @@ public enum MiniNeError: Error {
     
     case badRequest(message: String)
     
+    case responseValidationFailed(message: String)
+    
     case connectionError(Error)
     
     case responseParseError(Error)
