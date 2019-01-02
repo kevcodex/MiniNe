@@ -11,11 +11,15 @@ public enum MiniNeError: Error {
     
     case badRequest(message: String)
     
-    case responseValidationFailed(message: String)
+    case responseValidationFailed(ResponseValidationFailure)
     
     case connectionError(Error)
     
     case responseParseError(Error)
     
     case unknown
+}
+
+public enum ResponseValidationFailure: Error {
+    case invalidStatusCode(code: Int)
 }

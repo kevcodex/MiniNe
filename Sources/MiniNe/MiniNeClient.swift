@@ -42,7 +42,8 @@ public class MiniNeClient {
                 let response = request.response(from: data, urlResponse: urlResponse)
                 
                 guard response.isValid(statusCodes: request.acceptableStatusCodes) else {
-                    completion(Result(error: .responseValidationFailed(message: "Invalid Status Code: \(response.statusCode)")))
+                    let failure = ResponseValidationFailure.invalidStatusCode(code: response.statusCode)
+                    completion(Result(error: .responseValidationFailed(failure)))
                     return
                 }
                 
