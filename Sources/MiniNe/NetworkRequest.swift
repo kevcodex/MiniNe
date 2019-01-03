@@ -52,7 +52,7 @@ public extension NetworkRequest {
     }
     
     func response(from data: Data, urlResponse: HTTPURLResponse) -> Response {
-        return Response(statusCode: urlResponse.statusCode, data: data)
+        return Response(statusCode: urlResponse.statusCode, data: data, requestURL: urlResponse.url)
     }
     
     var acceptableStatusCodes: [Int] {
