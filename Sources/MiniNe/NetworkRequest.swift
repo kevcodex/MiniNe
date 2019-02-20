@@ -63,6 +63,10 @@ public extension NetworkRequest {
 // MARK: - Private Helpers
 private extension NetworkRequest {
     func addPath(_ path: String, to request: inout URLRequest) {
+        guard !path.isEmpty else {
+            return
+        }
+        
         let url = request.url?.appendingPathComponent(path)
         request.url = url
     }
@@ -101,16 +105,8 @@ private extension NetworkRequest {
         switch body.encoding {
             
         case .json:
-            do {
-                let data = try JSONSerialization.data(withJSONObject: body.parameters, options: [])
-                
-                request.setValue(body.encoding.contentTypeValue, forHTTPHeaderField: "Content-Type")
-                request.httpBody = data
-                
-            } catch {
-                // Handle errors better
-                print(error)
-            }
+            request.setValue(body.encoding.contentTypeValue, forHTTPHeaderField: "Content-Type")
+            request.httpBody = body.data
         }
     }
 }
