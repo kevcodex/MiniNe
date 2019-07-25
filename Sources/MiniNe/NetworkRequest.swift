@@ -51,10 +51,6 @@ public extension NetworkRequest {
         return urlRequest
     }
     
-    func response(from data: Data, urlResponse: HTTPURLResponse) -> Response {
-        return Response(statusCode: urlResponse.statusCode, data: data, requestURL: urlResponse.url)
-    }
-    
     var acceptableStatusCodes: [Int] {
         return Array(200..<300)
     }
@@ -109,4 +105,12 @@ private extension NetworkRequest {
             request.httpBody = body.data
         }
     }
+}
+
+public protocol CodableRequest: NetworkRequest {
+    associatedtype Response: Codable
+}
+
+public protocol JSONRequest: NetworkRequest {
+    associatedtype Response: JSONDecodable
 }
