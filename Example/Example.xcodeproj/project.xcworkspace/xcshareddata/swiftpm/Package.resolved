@@ -3,10 +3,10 @@
     "pins": [
       {
         "package": "MiniNe",
-        "repositoryURL": "/Users/kevin/Documents/KNC_Creative/Swift_Scripting/Packages/MiniNe",
+        "repositoryURL": "https://github.com/kevcodex/MiniNe",
         "state": {
           "branch": null,
-          "revision": "bd3d2adbd2dd86dfcb7cd0ca185943e647457238",
+          "revision": "9cfad52f9a564426292227c15e1b089ee476962f",
           "version": "2.0.0"
         }
       }

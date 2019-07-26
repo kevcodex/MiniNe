@@ -13,7 +13,7 @@
 		0AFECE6422E94C6800C6BBB8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0AFECE6222E94C6800C6BBB8 /* Main.storyboard */; };
 		0AFECE6622E94C6A00C6BBB8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AFECE6522E94C6A00C6BBB8 /* Assets.xcassets */; };
 		0AFECE6922E94C6A00C6BBB8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0AFECE6722E94C6A00C6BBB8 /* LaunchScreen.storyboard */; };
-		0AFECE9522E94F1A00C6BBB8 /* MiniNe in Frameworks */ = {isa = PBXBuildFile; productRef = 0AFECE9422E94F1A00C6BBB8 /* MiniNe */; };
+		0AFECE9B22EB9EDE00C6BBB8 /* MiniNe in Frameworks */ = {isa = PBXBuildFile; productRef = 0AFECE9A22EB9EDE00C6BBB8 /* MiniNe */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,7 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AFECE9522E94F1A00C6BBB8 /* MiniNe in Frameworks */,
+				0AFECE9B22EB9EDE00C6BBB8 /* MiniNe in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,7 +86,7 @@
 			);
 			name = Example;
 			packageProductDependencies = (
-				0AFECE9422E94F1A00C6BBB8 /* MiniNe */,
+				0AFECE9A22EB9EDE00C6BBB8 /* MiniNe */,
 			);
 			productName = Example;
 			productReference = 0AFECE5922E94C6800C6BBB8 /* Example.app */;
@@ -117,7 +117,7 @@
 			);
 			mainGroup = 0AFECE5022E94C6800C6BBB8;
 			packageReferences = (
-				0AFECE9322E94F1A00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */,
+				0AFECE9922EB9EDE00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */,
 			);
 			productRefGroup = 0AFECE5A22E94C6800C6BBB8 /* Products */;
 			projectDirPath = "";
@@ -346,9 +346,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0AFECE9322E94F1A00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */ = {
+		0AFECE9922EB9EDE00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "file:///Users/kevin/Documents/KNC_Creative/Swift_Scripting/Packages/MiniNe";
+			repositoryURL = "https://github.com/kevcodex/MiniNe";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
@@ -357,9 +357,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0AFECE9422E94F1A00C6BBB8 /* MiniNe */ = {
+		0AFECE9A22EB9EDE00C6BBB8 /* MiniNe */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0AFECE9322E94F1A00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */;
+			package = 0AFECE9922EB9EDE00C6BBB8 /* XCRemoteSwiftPackageReference "MiniNe" */;
 			productName = MiniNe;
 		};
 /* End XCSwiftPackageProductDependency section */
