@@ -67,14 +67,14 @@ final class RequestTests: XCTestCase {
         
         let urlRequest = request.buildURLRequest()
         
-        let expectedURL = URL(string: "https://mockurl.com?foo=bar&fooz=barz")
         let expectedQueries = [URLQueryItem(name: "foo", value: "bar"),
                                URLQueryItem(name: "fooz", value: "barz")]
         
         let components = URLComponents(url: urlRequest!.url!, resolvingAgainstBaseURL: false)
         
-        XCTAssertTrue(urlRequest?.url == expectedURL)
-        XCTAssertTrue(components?.queryItems == expectedQueries)
+        let sortedQueryItems = components?.queryItems?.sorted { $0.name < $1.name }
+        
+        XCTAssertTrue(sortedQueryItems == expectedQueries)
     }
     
     func testBuildingURL_WithHeaders_IsSuccessful() {
@@ -105,12 +105,6 @@ final class RequestTests: XCTestCase {
     }
     
     func testBuildingNetworkBody_WithDictionary_IsSuccessful() {
-        
-        struct Foo: Decodable, Equatable {
-            let foo: String
-            let fooz: String
-        }
-        
         let jsonDecoder = JSONDecoder()
         
         let expectedData =

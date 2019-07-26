@@ -22,7 +22,7 @@ open class MiniNeClient {
     
     /// Basic network request to return data.
     open func send<Request: NetworkRequest>(request: Request,
-                                              completion: @escaping (Result<Response, MiniNeError>) -> Void) {
+                                            completion: @escaping (Result<Response, MiniNeError>) -> Void) {
         
         guard let urlRequest = request.buildURLRequest() else {
             completion(.failure(.badRequest(message: "Bad URL Request")))
@@ -69,12 +69,10 @@ open class MiniNeClient {
     open func invalidateAndCancel() {
         session.invalidateAndCancel()
     }
-}
-
-// MARK: - Codable Requests
-extension MiniNeClient {
+    
+    // MARK: - Codable Requests
     /// Makes a network request with any codable response object and will return it.
-    public func send<Request: CodableRequest>(
+    open func send<Request: CodableRequest>(
         codableRequest: Request,
         completion: @escaping (Result<ResponseObject<Request.Response>, MiniNeError>) -> Void) {
         
@@ -96,7 +94,7 @@ extension MiniNeClient {
     }
     
     /// Network request to decode to the specified codable object
-    public func send<Request: NetworkRequest, Response: Decodable>(
+    open func send<Request: NetworkRequest, Response: Decodable>(
         responseType: Response.Type,
         request: Request,
         completion: @escaping (Result<ResponseObject<Response>, MiniNeError>) -> Void) {
@@ -107,8 +105,8 @@ extension MiniNeClient {
                 let decoder = JSONDecoder()
                 do {
                     let object = try decoder.decode(responseType.self, from: response.data)
-                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
-                    completion(.success(foo))
+                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
+                    completion(.success(response))
                 } catch {
                     completion(.failure(.responseParseError(error)))
                 }
@@ -117,12 +115,11 @@ extension MiniNeClient {
             }
         }
     }
-}
-
-// MARK: - JSONDecodable Requests
-extension MiniNeClient {
+    
+    
+    // MARK: - JSONDecodable Requests
     /// Send a network request and return a decoded object defined by the JSONDecodable protocol in the JSONRequest.
-    public func send<Request: JSONRequest>(
+    open func send<Request: JSONRequest>(
         jsonRequest: Request,
         completion: @escaping (Result<ResponseObject<Request.Response>, MiniNeError>) -> Void) {
         
@@ -144,7 +141,7 @@ extension MiniNeClient {
     }
     
     /// Send a network request and return a JSON decoded object specified.
-    public func send<Request: NetworkRequest, Response: JSONDecodable>(
+    open func send<Request: NetworkRequest, Response: JSONDecodable>(
         responseType: Response.Type,
         request: Request,
         completion: @escaping (Result<ResponseObject<Response>, MiniNeError>) -> Void) {
@@ -155,8 +152,8 @@ extension MiniNeClient {
                 do {
                     let json = try JSONSerialization.jsonObject(with: response.data, options: [])
                     let object = try Response(json: json)
-                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
-                    completion(.success(foo))
+                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
+                    completion(.success(response))
                 } catch {
                     completion(.failure(.responseParseError(error)))
                 }
@@ -166,4 +163,3 @@ extension MiniNeClient {
         }
     }
 }
-

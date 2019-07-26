@@ -146,3 +146,80 @@ enum MockStandardRequest: NetworkRequest {
         }
     }
 }
+
+struct Foo: Decodable, Equatable {
+    let foo: String
+    let fooz: String
+}
+
+enum JSONDecodeError: Error {
+    case invalidFormat
+    case missingValue(key: String, actualValue: Any?)
+}
+
+struct Bar: JSONDecodable {
+    
+    let bar: String
+    let barz: String
+    
+    init(json: Any) throws {
+        guard let dictionary = json as? [String: Any] else {
+            throw JSONDecodeError.invalidFormat
+        }
+        
+        guard let bar = dictionary["bar"] as? String else {
+            throw JSONDecodeError.missingValue(key: "bar", actualValue: dictionary["bar"])
+        }
+        
+        guard let barz = dictionary["barz"] as? String else {
+            throw JSONDecodeError.missingValue(key: "barz", actualValue: dictionary["barz"])
+        }
+        
+        self.bar = bar
+        self.barz = barz
+    }
+}
+
+struct MockCodableRequest: CodableRequest {
+    typealias Response = Foo
+    
+    var baseURL: URL? {
+        return URL(string: "https://mockurl.com")
+    }
+    
+    var path: String {
+        return ""
+    }
+    
+    var method: HTTPMethod {
+        return .get
+    }
+    
+    var parameters: [String : Any]?
+    
+    var headers: [String : Any]?
+    
+    var body: NetworkBody?
+}
+
+struct MockJSONDecodableRequest: JSONRequest {
+    typealias Response = Bar
+    
+    var baseURL: URL? {
+        return URL(string: "https://mockurl.com")
+    }
+    
+    var path: String {
+        return ""
+    }
+    
+    var method: HTTPMethod {
+        return .get
+    }
+    
+    var parameters: [String : Any]?
+    
+    var headers: [String : Any]?
+    
+    var body: NetworkBody?
+}
