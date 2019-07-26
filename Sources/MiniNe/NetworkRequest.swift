@@ -108,7 +108,7 @@ private extension NetworkRequest {
 }
 
 public protocol CodableRequest: NetworkRequest {
-    associatedtype Response: Codable
+    associatedtype Response: Decodable
 }
 
 public protocol JSONRequest: NetworkRequest {

@@ -92,7 +92,7 @@ extension MiniNeClient {
     }
     
     /// Network request to decode to the specified codable object
-    public func send<Request: NetworkRequest, Response: Codable>(
+    public func send<Request: NetworkRequest, Response: Decodable>(
         responseType: Response.Type,
         request: Request,
         completion: @escaping (Result<ResponseObject<Response>, MiniNeError>) -> Void) {
