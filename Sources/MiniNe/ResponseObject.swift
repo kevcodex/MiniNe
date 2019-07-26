@@ -11,8 +11,8 @@ import Foundation
 public class ResponseObject<Object>: Response {
     public let object: Object
     
-    public init(object: Object, statusCode: Int, data: Data, requestURL: URL?) {
+    public init(object: Object, statusCode: Int, data: Data, request: URLRequest?, httpResponse: HTTPURLResponse?) {
         self.object = object
-        super.init(statusCode: statusCode, data: data, requestURL: requestURL)
+        super.init(statusCode: statusCode, data: data, request: request, httpResponse: httpResponse)
     }
 }

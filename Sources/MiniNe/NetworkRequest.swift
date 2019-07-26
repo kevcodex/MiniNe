@@ -54,6 +54,18 @@ public extension NetworkRequest {
     var acceptableStatusCodes: [Int] {
         return Array(200..<300)
     }
+    
+    var url: URL? {
+        guard let baseURL = baseURL else {
+            return nil
+        }
+        
+        guard !path.isEmpty else {
+            return baseURL
+        }
+        
+        return baseURL.appendingPathComponent(path)
+    }
 }
 
 // MARK: - Private Helpers

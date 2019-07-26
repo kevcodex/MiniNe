@@ -7,15 +7,21 @@
 
 import Foundation
 
-public class MiniNeClient {
-    private let session: URLSession = {
+open class MiniNeClient {
+    public static let defaultSession: URLSession = {
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration)
         return session
     }()
     
+    public let session: URLSession
+    
+    public init(session: URLSession = defaultSession) {
+        self.session = session
+    }
+    
     /// Basic network request to return data.
-    public func send<Request: NetworkRequest>(request: Request,
+    open func send<Request: NetworkRequest>(request: Request,
                                               completion: @escaping (Result<Response, MiniNeError>) -> Void) {
         
         guard let urlRequest = request.buildURLRequest() else {
@@ -40,7 +46,7 @@ public class MiniNeClient {
                     return
                 }
                 
-                let response = Response(statusCode: urlResponse.statusCode, data: data, requestURL: urlResponse.url)
+                let response = Response(statusCode: urlResponse.statusCode, data: data, request: urlRequest, httpResponse: urlResponse)
                 
                 guard response.isValid(statusCodes: request.acceptableStatusCodes) else {
                     let failure = ResponseValidationFailure.invalidStatusCode(code: response.statusCode)
@@ -60,11 +66,9 @@ public class MiniNeClient {
     }
     
     /// Cancels all outstanding tasks and then invalidates the URLSession.
-    public func invalidateAndCancel() {
+    open func invalidateAndCancel() {
         session.invalidateAndCancel()
     }
-    
-    public init() { }
 }
 
 // MARK: - Codable Requests
@@ -80,7 +84,7 @@ extension MiniNeClient {
                 let decoder = JSONDecoder()
                 do {
                     let object = try decoder.decode(Request.Response.self, from: response.data)
-                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, requestURL: response.requestURL)
+                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
                     completion(.failure(.responseParseError(error)))
@@ -103,7 +107,7 @@ extension MiniNeClient {
                 let decoder = JSONDecoder()
                 do {
                     let object = try decoder.decode(responseType.self, from: response.data)
-                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, requestURL: response.requestURL)
+                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(foo))
                 } catch {
                     completion(.failure(.responseParseError(error)))
@@ -128,7 +132,7 @@ extension MiniNeClient {
                 do {
                     let json = try JSONSerialization.jsonObject(with: response.data, options: [])
                     let object = try Request.Response(json: json)
-                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, requestURL: response.requestURL)
+                    let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
                     completion(.failure(.responseParseError(error)))
@@ -151,7 +155,7 @@ extension MiniNeClient {
                 do {
                     let json = try JSONSerialization.jsonObject(with: response.data, options: [])
                     let object = try Response(json: json)
-                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, requestURL: response.requestURL)
+                    let foo = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(foo))
                 } catch {
                     completion(.failure(.responseParseError(error)))

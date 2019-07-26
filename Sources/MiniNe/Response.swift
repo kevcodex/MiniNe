@@ -4,14 +4,17 @@ public class Response {
     public let statusCode: Int
     public let data: Data
     
-    /// The requesting URL. This may not be the original url if there was a redirect.
-    /// TODO: should change?
-    public let requestURL: URL?
+    /// The original URLRequest for the response.
+    /// The requesting URLRequest. This may not be the original url if there was a redirect.
+    public let request: URLRequest?
     
-    public init(statusCode: Int, data: Data, requestURL: URL?) {
+    public let httpResponse: HTTPURLResponse?
+    
+    public init(statusCode: Int, data: Data, request: URLRequest?, httpResponse: HTTPURLResponse?) {
         self.statusCode = statusCode
         self.data = data
-        self.requestURL = requestURL
+        self.request = request
+        self.httpResponse = httpResponse
     }
 }
 

@@ -54,7 +54,7 @@ class ViewController: UIViewController {
     }
 }
 
-struct TestCodableModel: Codable {
+struct TestCodableModel: Decodable {
     let userId: Int
     let id: Int
     let title: String
