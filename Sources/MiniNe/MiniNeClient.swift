@@ -49,7 +49,7 @@ open class MiniNeClient {
                 let response = Response(statusCode: urlResponse.statusCode, data: data, request: urlRequest, httpResponse: urlResponse)
                 
                 guard response.isValid(statusCodes: request.acceptableStatusCodes) else {
-                    let failure = ResponseValidationFailure.invalidStatusCode(code: response.statusCode)
+                    let failure = Response(statusCode: response.statusCode, data: response.data, request: urlRequest, httpResponse: urlResponse)
                     completion(.failure(.responseValidationFailed(failure)))
                     return
                 }
@@ -85,7 +85,7 @@ open class MiniNeClient {
                     let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
-                    completion(.failure(.responseParseError(error)))
+                    completion(.failure(.responseParseError(error, response: response)))
                 }
             case .failure(let error):
                 completion(.failure(error))
@@ -108,7 +108,7 @@ open class MiniNeClient {
                     let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
-                    completion(.failure(.responseParseError(error)))
+                    completion(.failure(.responseParseError(error, response: response)))
                 }
             case .failure(let error):
                 completion(.failure(error))
@@ -132,7 +132,7 @@ open class MiniNeClient {
                     let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
-                    completion(.failure(.responseParseError(error)))
+                    completion(.failure(.responseParseError(error, response: response)))
                 }
             case .failure(let error):
                 completion(.failure(error))
@@ -155,7 +155,7 @@ open class MiniNeClient {
                     let response = ResponseObject(object: object, statusCode: response.statusCode, data: response.data, request: response.request, httpResponse: response.httpResponse)
                     completion(.success(response))
                 } catch {
-                    completion(.failure(.responseParseError(error)))
+                    completion(.failure(.responseParseError(error, response: response)))
                 }
             case .failure(let error):
                 completion(.failure(error))

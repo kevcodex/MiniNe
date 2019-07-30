@@ -103,14 +103,47 @@ final class MiniNeClientTests: XCTestCase {
             case .failure(let error):
                 
                 switch error {
-                case .responseValidationFailed(let failure):
-                    switch failure {
-                    case .invalidStatusCode(let code):
-                        XCTAssertTrue(code == 400)
-                    }
+                case .responseValidationFailed(let response):
+                    XCTAssertTrue(response.statusCode == 400)
                 default:
                     XCTFail("Incorrect Error")
                 }
+            }
+        }
+    }
+    
+    func testErrorResponseValidation_WithErrorData() {
+        
+        struct MockErrorResponse: Decodable {
+            let error: String
+        }
+        
+        let request = MockStandardRequest.validRequest
+        
+        let expectedData =
+            """
+                {
+                    "error": "foo"
+                }
+            """
+                .data(using: .utf8)!
+        session.mockData = expectedData
+        session.mockURLResponse = HTTPURLResponse(url: request.url!,
+                                                  statusCode: 400,
+                                                  httpVersion: "HTTP/1.1",
+                                                  headerFields: nil)
+        
+        client.send(request: request) { (result) in
+            switch result {
+                
+            case .success:
+                XCTFail("There was an error. Should not be successful!")
+            case .failure(let error):
+                
+                let response = error.response!
+                let jsonDecoder = JSONDecoder()
+                let responseError = try! jsonDecoder.decode(MockErrorResponse.self, from: response.data)
+                XCTAssertTrue(responseError.error == "foo")
             }
         }
     }
@@ -176,6 +209,11 @@ final class MiniNeClientTests: XCTestCase {
                 default:
                     XCTFail("Incorrect Error")
                 }
+                
+                let response = error.response!
+                
+                XCTAssertTrue(response.statusCode == 200)
+
             }
         }
     }

@@ -11,15 +11,27 @@ public enum MiniNeError: Error {
     
     case badRequest(message: String)
     
-    case responseValidationFailed(ResponseValidationFailure)
+    case responseValidationFailed(Response)
     
     case connectionError(Error)
     
-    case responseParseError(Error)
+    case responseParseError(Error, response: Response)
     
     case unknown
-}
-
-public enum ResponseValidationFailure: Error {
-    case invalidStatusCode(code: Int)
+    
+    public var response: Response? {
+        switch self {
+            
+        case .badRequest:
+            return nil
+        case .responseValidationFailed(let response):
+            return response
+        case .connectionError:
+            return nil
+        case .responseParseError(_, let response):
+            return response
+        case .unknown:
+            return nil
+        }
+    }
 }
