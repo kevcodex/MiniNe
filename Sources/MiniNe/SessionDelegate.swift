@@ -7,29 +7,29 @@
 
 import Foundation
 
+// TODO: - Currently only handles data session, but I believe a fairly straightforward refactor can allow for supporting other sessions like download
 open class SessionDelegate: NSObject {
     
-    /// Used because multiple threads could access or modify the tasks dictionary
-    private let serialQueue: DispatchQueue = DispatchQueue(label: "TaskHandlerSerialQueue")
-    
-    public var tasks: [Int: TaskHandler] = [:]
+    public private(set) var tasks = ThreadSafeDictionary<Int, TaskHandler>()
     
     public override init() {
         super.init()
+    }
+    
+    public func addTaskHandler(_ taskHandler: TaskHandler, for task: URLSessionDataTask) {
+        tasks[task.taskIdentifier] = taskHandler
     }
 }
 
 extension SessionDelegate: URLSessionDelegate {
 
     open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+                
+        let taskHandler = tasks[task.taskIdentifier]
         
-        serialQueue.sync {
-            let taskHandler = tasks[task.taskIdentifier]
-            
-            taskHandler?.taskResponder.didComplete(taskHandler?.data, task.response, error)
-            
-            tasks[task.taskIdentifier] = nil
-        }
+        taskHandler?.taskResponder.didComplete(taskHandler?.data, task.response, error)
+        
+        self.tasks[task.taskIdentifier] = nil
     }
 }
 
@@ -42,22 +42,22 @@ extension SessionDelegate: URLSessionDataDelegate {
     
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         
-        serialQueue.sync {
-            tasks[dataTask.taskIdentifier]?.data.append(data)
-            
-            let bytes = Int64(data.count)
-            tasks[dataTask.taskIdentifier]?.totalBytesRecieved += bytes
-            
-            let totalBytes = dataTask.response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
-            
-            tasks[dataTask.taskIdentifier]?.progress.totalUnitCount = totalBytes
-            tasks[dataTask.taskIdentifier]?.progress.completedUnitCount = tasks[dataTask.taskIdentifier]?.totalBytesRecieved ?? 0
-            
-            
-            if let progressBlock = tasks[dataTask.taskIdentifier]?.progressBlock,
-                let progress = tasks[dataTask.taskIdentifier]?.progress {
-                progressBlock(ProgressResponse(progress: progress))
-            }
+        let taskHandler = tasks[dataTask.taskIdentifier]
+        
+        taskHandler?.data.append(data)
+        
+        let bytes = Int64(data.count)
+        taskHandler?.totalBytesRecieved += bytes
+        
+        let totalBytes = dataTask.response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
+        
+        taskHandler?.progress.totalUnitCount = totalBytes
+        taskHandler?.progress.completedUnitCount = taskHandler?.totalBytesRecieved ?? 0
+        
+        
+        if let progressBlock = taskHandler?.progressBlock,
+            let progress = taskHandler?.progress {
+            progressBlock(ProgressResponse(progress: progress))
         }
     }
 }

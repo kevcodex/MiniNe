@@ -69,7 +69,7 @@ open class MiniNeClient {
         
         let task = session.dataTask(with: urlRequest)
         
-        delegate?.tasks[task.taskIdentifier] = taskHandler
+        delegate?.addTaskHandler(taskHandler, for: task)
 
         task.resume()
     }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct TaskHandler {
+open class TaskHandler {
     public var totalBytesRecieved: Int64 = 0
     
     public var progress: Progress
