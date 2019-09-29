@@ -19,10 +19,12 @@ class ViewController: UIViewController {
         
         let client = MiniNeClient()
         
-        client.send(request: request, progressBlock: { (progress) in
+        let progressHandler = ProgressHandler { (progressResponse) in
             print(Thread.isMainThread)
-            print(progress.progress.fractionCompleted)
-        }) { (result) in
+            print(progressResponse.progress.fractionCompleted)
+        }
+        
+        client.send(request: request, progressHandler: progressHandler) { (result) in
             switch result {
             case .success(let response):
                 let image = UIImage(data: response.data)
