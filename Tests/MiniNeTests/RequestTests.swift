@@ -29,7 +29,7 @@ final class RequestTests: XCTestCase {
     func testFullURL_WithoutPath_IsSuccessful() {
         let request = MockStandardRequest.validRequest
         
-        let expectedURL = URL(string: "https://mockurl.com")
+        let expectedURL = URL(string: "https://mockurlawfgafwafawf.com")
         
         XCTAssertTrue(request.url == expectedURL)
     }
@@ -39,7 +39,7 @@ final class RequestTests: XCTestCase {
         
         let urlRequest = request.buildURLRequest()
         
-        let expectedURL = URL(string: "https://mockurl.com")
+        let expectedURL = URL(string: "https://mockurlawfgafwafawf.com")
         
         XCTAssertTrue(urlRequest?.url == expectedURL)
     }
@@ -47,7 +47,7 @@ final class RequestTests: XCTestCase {
     func testFullURL_WithPath_IsSuccessful() {
         let request = MockStandardRequest.validRequestWithPath
         
-        let expectedURL = URL(string: "https://mockurl.com/foo")
+        let expectedURL = URL(string: "https://mockurlawfgafwafawf.com/foo")
         
         XCTAssertTrue(request.url == expectedURL)
     }
@@ -57,7 +57,7 @@ final class RequestTests: XCTestCase {
         
         let urlRequest = request.buildURLRequest()
         
-        let expectedURL = URL(string: "https://mockurl.com/foo")
+        let expectedURL = URL(string: "https://mockurlawfgafwafawf.com/foo")
         
         XCTAssertTrue(urlRequest?.url == expectedURL)
     }

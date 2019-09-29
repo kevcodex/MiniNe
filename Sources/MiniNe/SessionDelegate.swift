@@ -42,22 +42,22 @@ extension SessionDelegate: URLSessionDataDelegate {
     
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         
-        let taskHandler = tasks[dataTask.taskIdentifier]
+        guard let taskHandler = tasks[dataTask.taskIdentifier] else {
+            return
+        }
         
-        taskHandler?.data.append(data)
+        taskHandler.data.append(data)
         
         let bytes = Int64(data.count)
-        taskHandler?.totalBytesRecieved += bytes
+        taskHandler.totalBytesRecieved += bytes
         
         let totalBytes = dataTask.response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
         
-        taskHandler?.progress.totalUnitCount = totalBytes
-        taskHandler?.progress.completedUnitCount = taskHandler?.totalBytesRecieved ?? 0
+        taskHandler.progress.totalUnitCount = totalBytes
+        taskHandler.progress.completedUnitCount = taskHandler.totalBytesRecieved
         
-        
-        if let progressBlock = taskHandler?.progressBlock,
-            let progress = taskHandler?.progress {
-            progressBlock(ProgressResponse(progress: progress))
+        if let progressBlock = taskHandler.progressBlock {
+            progressBlock(ProgressResponse(progress: taskHandler.progress))
         }
     }
 }

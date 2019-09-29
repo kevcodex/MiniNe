@@ -4,12 +4,12 @@ import XCTest
 final class MiniNeClientTests: XCTestCase {
     
     var client: MiniNeClient!
-    var session: Tester!
+    var session: MockSessionDelegate!
     
     override func setUp() {
         super.setUp()
         
-        session = Tester()
+        session = MockSessionDelegate()
         
         let configuration = URLSessionConfiguration.default
         
@@ -48,6 +48,8 @@ final class MiniNeClientTests: XCTestCase {
 
     func testInvalidURL_ReturnsError() {
         let request = MockStandardRequest.invalidRequest
+        
+        let expectation = XCTestExpectation(description: "test")
 
         client.send(request: request) { (result) in
             switch result {
@@ -63,7 +65,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testConnectionError() {
@@ -76,6 +82,8 @@ final class MiniNeClientTests: XCTestCase {
 
         session.mockError = MockError.failure
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(request: request) { (result) in
             switch result {
 
@@ -91,7 +99,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testUnacceptableStatusCodes() {
@@ -105,6 +117,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(request: request) { (result) in
             switch result {
 
@@ -119,7 +133,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testErrorResponseValidation_WithErrorData() {
@@ -143,6 +161,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(request: request) { (result) in
             switch result {
 
@@ -155,7 +175,11 @@ final class MiniNeClientTests: XCTestCase {
                 let responseError = try! jsonDecoder.decode(MockErrorResponse.self, from: response.data)
                 XCTAssertTrue(responseError.error == "foo")
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testSuccessfullRequest_ForCodableRequestType() {
@@ -177,6 +201,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(responseType: Foo.self, request: request) { (result) in
             switch result {
             case .success(let response):
@@ -185,7 +211,11 @@ final class MiniNeClientTests: XCTestCase {
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     // MARK: - Request Type Tests
@@ -208,6 +238,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(responseType: Foo.self, request: request) { (result) in
             switch result {
             case .success:
@@ -225,7 +257,11 @@ final class MiniNeClientTests: XCTestCase {
                 XCTAssertTrue(response.statusCode == 200)
 
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testSuccessfulRequest_ForJSONDecodableRequestType() {
@@ -247,6 +283,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(responseType: Bar.self, request: request) { (result) in
             switch result {
             case .success(let response):
@@ -255,7 +293,11 @@ final class MiniNeClientTests: XCTestCase {
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testRequest_ForJSONDecodableRequestType_WithDecodingError() {
@@ -277,6 +319,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(responseType: Bar.self, request: request) { (result) in
             switch result {
             case .success:
@@ -289,7 +333,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     // MARK: - Associated Request Type Tests
@@ -312,6 +360,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(codableRequest: request) { (result) in
             switch result {
             case .success(let response):
@@ -320,7 +370,11 @@ final class MiniNeClientTests: XCTestCase {
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testRequest_ForCodableRequest_WithDecodingError() {
@@ -342,6 +396,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(codableRequest: request) { (result) in
             switch result {
             case .success:
@@ -354,7 +410,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testSuccessfulRequest_ForJSONDecodableRequest() {
@@ -375,7 +435,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   statusCode: 200,
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
-
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(jsonRequest: request) { (result) in
             switch result {
             case .success(let response):
@@ -384,7 +445,11 @@ final class MiniNeClientTests: XCTestCase {
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     func testRequest_ForJSONDecodableRequest_WithDecodingError() {
@@ -406,6 +471,8 @@ final class MiniNeClientTests: XCTestCase {
                                                   httpVersion: "HTTP/1.1",
                                                   headerFields: nil)
 
+        let expectation = XCTestExpectation(description: "test")
+        
         client.send(jsonRequest: request) { (result) in
             switch result {
             case .success:
@@ -418,7 +485,11 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 5.0)
     }
 
     static var allTests = [

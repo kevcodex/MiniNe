@@ -8,38 +8,18 @@
 import Foundation
 import MiniNe
 
-class Tester: SessionDelegate {
+class MockSessionDelegate: SessionDelegate {
     var mockData: Data?
     var mockURLResponse: URLResponse?
     var mockError: Error?
-        
     
     override func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         tasks[task.taskIdentifier]?.taskResponder.didComplete(mockData, mockURLResponse, mockError)
     }
 }
 
-class MockURLSession: URLSession {
-    var mockData: Data?
-    var mockURLResponse: URLResponse?
-    var mockError: Error?
-    
-    override var delegate: URLSessionDelegate? {
-        return SessionDelegate()
-    }
-    
-    override var configuration: URLSessionConfiguration {
-        return .default
-    }
-    
-    override func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        
-        completionHandler(mockData, mockURLResponse, mockError)
-        
-        return URLSessionDataTask()
-    }
-}
-
+// TODO: - Figure out a way to return urlsession immediatly without calling url
+// For now just use a fake url
 enum MockStandardRequest: NetworkRequest {
     case validRequest
     case validRequestWithPath
@@ -52,17 +32,17 @@ enum MockStandardRequest: NetworkRequest {
         switch self {
             
         case .validRequest:
-            return URL(string: "https://mockurl.com")
+            return URL(string: "https://mockurlawfgafwafawf.com")
         case .validRequestWithPath:
-            return URL(string: "https://mockurl.com")
+            return URL(string: "https://mockurlawfgafwafawf.com")
         case .invalidRequest:
             return URL(string: "")
         case .validRequestWithQueryParams:
-            return URL(string: "https://mockurl.com")
+            return URL(string: "https://mockurlawfgafwafawf.com")
         case .validRequestWithHeaders:
-            return URL(string: "https://mockurl.com")
+            return URL(string: "https://mockurlawfgafwafawf.com")
         case .validRequestWithJSONBody:
-            return URL(string: "https://mockurl.com")
+            return URL(string: "https://mockurlawfgafwafawf.com")
         }
     }
     
@@ -203,7 +183,7 @@ struct MockCodableRequest: CodableRequest {
     typealias Response = Foo
     
     var baseURL: URL? {
-        return URL(string: "https://mockurl.com")
+        return URL(string: "https://mockurlawfgafwafawf.com")
     }
     
     var path: String {
@@ -225,7 +205,7 @@ struct MockJSONDecodableRequest: JSONRequest {
     typealias Response = Bar
     
     var baseURL: URL? {
-        return URL(string: "https://mockurl.com")
+        return URL(string: "https://mockurlawfgafwafawf.com")
     }
     
     var path: String {
