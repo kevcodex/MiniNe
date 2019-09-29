@@ -56,8 +56,11 @@ extension SessionDelegate: URLSessionDataDelegate {
         taskHandler.progress.totalUnitCount = totalBytes
         taskHandler.progress.completedUnitCount = taskHandler.totalBytesRecieved
         
-        if let progressBlock = taskHandler.progressBlock {
-            progressBlock(ProgressResponse(progress: taskHandler.progress))
+        if let progressHandler = taskHandler.progressHandler {
+            
+            progressHandler.callbackQueue.async {
+                progressHandler.progressBlock(ProgressResponse(progress: taskHandler.progress))
+            }
         }
     }
 }

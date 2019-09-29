@@ -14,15 +14,15 @@ open class TaskHandler {
             
     public var data: Data
     
-    public let progressBlock: ((ProgressResponse) -> Void)?
+    public let progressHandler: ProgressHandler?
 
     public let taskResponder: TaskResponder
     
-    public init(taskResponder: TaskResponder, progressBlock: ((ProgressResponse) -> Void)? = nil) {
+    public init(taskResponder: TaskResponder, progressHandler: ProgressHandler? = nil) {
         data = Data()
         progress = Progress(totalUnitCount: 0)
         
-        self.progressBlock = progressBlock
+        self.progressHandler = progressHandler
         self.taskResponder = taskResponder
     }
 }

@@ -24,7 +24,8 @@ open class MiniNeClient {
     
     /// Basic network request to return data.
     open func send<Request: NetworkRequest>(request: Request,
-                                            progressBlock: ((ProgressResponse) -> Void)? = nil,
+                                            callBackQueue: DispatchQueue = .main,
+                                            progressHandler: ProgressHandler? = nil,
                                             completion: @escaping (Result<Response, MiniNeError>) -> Void) {
         
         guard let urlRequest = request.buildURLRequest() else {
@@ -34,17 +35,23 @@ open class MiniNeClient {
         
         let dataTaskResponder = DataTaskResponder { (data, response, error) in
             
+            let callBackCompletion: (Result<Response, MiniNeError>) -> Void = { result in
+                callBackQueue.async {
+                    completion(result)
+                }
+            }
+            
             switch (data, response, error) {
                 
             // if an error
             case let (_, _, error?):
-                completion(.failure(.connectionError(error)))
+                callBackCompletion(.failure(.connectionError(error)))
                 
             // if theres data and response
             case let (data?, response?, _):
                 
                 guard let urlResponse = response as? HTTPURLResponse else {
-                    completion(.failure(.badRequest(message: "Bad HTTP URL Request")))
+                    callBackCompletion(.failure(.badRequest(message: "Bad HTTP URL Request")))
                     return
                 }
                 
@@ -52,20 +59,20 @@ open class MiniNeClient {
                 
                 guard response.isValid(statusCodes: request.acceptableStatusCodes) else {
                     let failure = Response(statusCode: response.statusCode, data: response.data, request: urlRequest, httpResponse: urlResponse)
-                    completion(.failure(.responseValidationFailed(failure)))
+                    callBackCompletion(.failure(.responseValidationFailed(failure)))
                     return
                 }
                 
-                completion(.success(response))
+                callBackCompletion(.success(response))
                 
             default:
                 assertionFailure("Invalid response combination")
-                completion(.failure(.unknown))
+                callBackCompletion(.failure(.unknown))
                 break
             }
         }
         
-        let taskHandler = TaskHandler(taskResponder: dataTaskResponder, progressBlock: progressBlock)
+        let taskHandler = TaskHandler(taskResponder: dataTaskResponder, progressHandler: progressHandler)
         
         let task = session.dataTask(with: urlRequest)
         
@@ -83,9 +90,11 @@ open class MiniNeClient {
     /// Makes a network request with any codable response object and will return it.
     open func send<Request: CodableRequest>(
         codableRequest: Request,
+        callBackQueue: DispatchQueue = .main,
+        progressHandler: ProgressHandler? = nil,
         completion: @escaping (Result<ResponseObject<Request.Response>, MiniNeError>) -> Void) {
         
-        send(request: codableRequest) { (result) in
+        send(request: codableRequest, callBackQueue: callBackQueue, progressHandler: progressHandler) { (result) in
             switch result {
             case .success(let response):
                 let decoder = JSONDecoder()
@@ -106,9 +115,11 @@ open class MiniNeClient {
     open func send<Request: NetworkRequest, Response: Decodable>(
         responseType: Response.Type,
         request: Request,
+        callBackQueue: DispatchQueue = .main,
+        progressHandler: ProgressHandler? = nil,
         completion: @escaping (Result<ResponseObject<Response>, MiniNeError>) -> Void) {
         
-        send(request: request) { (result) in
+        send(request: request, callBackQueue: callBackQueue, progressHandler: progressHandler) { (result) in
             switch result {
             case .success(let response):
                 let decoder = JSONDecoder()
@@ -130,9 +141,11 @@ open class MiniNeClient {
     /// Send a network request and return a decoded object defined by the JSONDecodable protocol in the JSONRequest.
     open func send<Request: JSONRequest>(
         jsonRequest: Request,
+        callBackQueue: DispatchQueue = .main,
+        progressHandler: ProgressHandler? = nil,
         completion: @escaping (Result<ResponseObject<Request.Response>, MiniNeError>) -> Void) {
         
-        send(request: jsonRequest) { (result) in
+        send(request: jsonRequest, callBackQueue: callBackQueue, progressHandler: progressHandler) { (result) in
             switch result {
             case .success(let response):
                 do {
@@ -153,9 +166,11 @@ open class MiniNeClient {
     open func send<Request: NetworkRequest, Response: JSONDecodable>(
         responseType: Response.Type,
         request: Request,
+        callBackQueue: DispatchQueue = .main,
+        progressHandler: ProgressHandler? = nil,
         completion: @escaping (Result<ResponseObject<Response>, MiniNeError>) -> Void) {
         
-        send(request: request) { (result) in
+        send(request: request, callBackQueue: callBackQueue, progressHandler: progressHandler) { (result) in
             switch result {
             case .success(let response):
                 do {

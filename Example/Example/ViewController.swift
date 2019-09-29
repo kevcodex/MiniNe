@@ -20,6 +20,7 @@ class ViewController: UIViewController {
         let client = MiniNeClient()
         
         client.send(request: request, progressBlock: { (progress) in
+            print(Thread.isMainThread)
             print(progress.progress.fractionCompleted)
         }) { (result) in
             switch result {
@@ -33,6 +34,8 @@ class ViewController: UIViewController {
             case .failure(let error):
                 print(error)
             }
+            
+            print("Finished Thread: ", Thread.isMainThread)
         }
         
         let request2 = TestRequest()

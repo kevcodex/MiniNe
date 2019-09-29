@@ -290,6 +290,7 @@ final class MiniNeClientTests: XCTestCase {
             case .success(let response):
                 XCTAssertTrue(response.object.bar == "foo")
                 XCTAssertTrue(response.object.barz == "fooz")
+                XCTAssertTrue(Thread.isMainThread)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
@@ -367,6 +368,7 @@ final class MiniNeClientTests: XCTestCase {
             case .success(let response):
                 XCTAssertTrue(response.object.foo == "bar")
                 XCTAssertTrue(response.object.fooz == "barz")
+                XCTAssertTrue(Thread.isMainThread)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
@@ -485,6 +487,55 @@ final class MiniNeClientTests: XCTestCase {
                     XCTFail("Incorrect Error")
                 }
             }
+            
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testDefaultCallbackQueue() {
+        let request = MockStandardRequest.validRequest
+        
+        let expectedData = "{}".data(using: .utf8)
+        let expectedStatusCode = 200
+        session.mockData = expectedData
+        session.mockURLResponse = HTTPURLResponse(url: request.url!,
+                                                  statusCode: expectedStatusCode,
+                                                  httpVersion: "HTTP/1.1",
+                                                  headerFields: nil)
+        
+        let expectation = XCTestExpectation(description: "test")
+
+        client.send(request: request) { (result) in
+            
+            XCTAssertTrue(Thread.isMainThread)
+            
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testSettingCallbackQueue() {
+        let request = MockStandardRequest.validRequest
+        
+        let expectedData = "{}".data(using: .utf8)
+        let expectedStatusCode = 200
+        session.mockData = expectedData
+        session.mockURLResponse = HTTPURLResponse(url: request.url!,
+                                                  statusCode: expectedStatusCode,
+                                                  httpVersion: "HTTP/1.1",
+                                                  headerFields: nil)
+        
+        let expectation = XCTestExpectation(description: "test")
+        
+        let testQueue = DispatchQueue(label: "dawdwa", qos: .utility)
+
+        client.send(request: request, callBackQueue: testQueue) { (result) in
+            
+            XCTAssertTrue(!Thread.isMainThread)
+            XCTAssertTrue(Thread.current.qualityOfService == .utility)
             
             expectation.fulfill()
         }
