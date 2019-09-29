@@ -11,23 +11,23 @@ import MiniNe
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var imageView: UIImageView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let request = TestRequest()
+        let request = BigRequest()
         
         let client = MiniNeClient()
         
         client.send(request: request, progressBlock: { (progress) in
-            print(progress)
+            print(progress.progress.fractionCompleted)
         }) { (result) in
             switch result {
             case .success(let response):
-                let jsonDecoder = JSONDecoder()
-                do {
-                    let model = try jsonDecoder.decode(TestCodableModel.self, from: response.data)
-                    print("Simple Request: \n Code: \(response.statusCode), \(model)")
-                } catch {
-                    print(error)
+                let image = UIImage(data: response.data)
+                
+                DispatchQueue.main.async {
+                    self.imageView.image = image
                 }
                 
             case .failure(let error):
@@ -35,19 +35,21 @@ class ViewController: UIViewController {
             }
         }
         
-        client.send(responseType: TestCodableModel.self, request: request) { (result) in
+        let request2 = TestRequest()
+        
+        client.send(responseType: TestCodableModel.self, request: request2) { (result) in
             switch result {
             case .success(let response):
                 print("Auto Decode Codable Request: \n Code: \(response.statusCode), \(response.object)")
-                
+
             case .failure(let error):
                 print(error)
             }
         }
-        
-        client.send(responseType: TestJSONModel.self, request: request) { (result) in
+
+        client.send(responseType: TestJSONModel.self, request: request2) { (result) in
             switch result {
-                
+
             case .success(let response):
                 print("Auto Decode JSON Decodable Request: \n Code: \(response.statusCode), \(response.object)")
             case .failure(let error):
@@ -101,6 +103,26 @@ struct TestJSONModel: JSONDecodable {
         self.title = title
         self.completed = completed
     }
+}
+
+struct BigRequest: NetworkRequest {
+    var baseURL: URL? {
+        URL(string: "https://edge-sony-test.s3-us-west-1.amazonaws.com/Humor/patrick.jpeg")
+    }
+    
+    var path: String {
+        ""
+    }
+    
+    var method: HTTPMethod {
+        .get
+    }
+    
+    var parameters: [String : Any]?
+    
+    var headers: [String : Any]?
+    
+    var body: NetworkBody?
 }
 
 struct TestRequest: NetworkRequest {
