@@ -12,9 +12,10 @@ class Tester: SessionDelegate {
     var mockData: Data?
     var mockURLResponse: URLResponse?
     var mockError: Error?
+        
     
     override func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        test?(mockData, mockURLResponse, mockError)
+        tasks[task.taskIdentifier]?.taskResponder.didComplete(mockData, mockURLResponse, mockError)
     }
 }
 

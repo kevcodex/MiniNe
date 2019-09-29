@@ -9,21 +9,12 @@ import Foundation
 
 open class SessionDelegate: NSObject {
     
-    public var totalBytesRecieved: Int64 = 0
+    /// Used because multiple threads could access or modify the tasks dictionary
+    private let serialQueue: DispatchQueue = DispatchQueue(label: "TaskHandlerSerialQueue")
     
-    public var progress: Progress
-    
-    public var progressBlock: ((ProgressResponse) -> Void)?
-    
-    public var test: ((Data?, URLResponse?, Error?) -> Void)?
-    
-    public var data: Data
+    public var tasks: [Int: TaskHandler] = [:]
     
     public override init() {
-        
-        data = Data()
-        progress = Progress(totalUnitCount: 0)
-        
         super.init()
     }
 }
@@ -31,8 +22,14 @@ open class SessionDelegate: NSObject {
 extension SessionDelegate: URLSessionDelegate {
 
     open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        test?(data, task.response, error)
         
+        serialQueue.sync {
+            let taskHandler = tasks[task.taskIdentifier]
+            
+            taskHandler?.taskResponder.didComplete(taskHandler?.data, task.response, error)
+            
+            tasks[task.taskIdentifier] = nil
+        }
     }
 }
 
@@ -45,22 +42,22 @@ extension SessionDelegate: URLSessionDataDelegate {
     
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         
-        self.data.append(data)
-        
-        let bytes = Int64(data.count)
-        totalBytesRecieved += bytes
-        
-        let totalBytes = dataTask.response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
-        
-        progress.totalUnitCount = totalBytes
-        progress.completedUnitCount = totalBytesRecieved
-        
-        
-        if let progressBlock = progressBlock {
-            progressBlock(ProgressResponse(progress: progress))
+        serialQueue.sync {
+            tasks[dataTask.taskIdentifier]?.data.append(data)
+            
+            let bytes = Int64(data.count)
+            tasks[dataTask.taskIdentifier]?.totalBytesRecieved += bytes
+            
+            let totalBytes = dataTask.response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
+            
+            tasks[dataTask.taskIdentifier]?.progress.totalUnitCount = totalBytes
+            tasks[dataTask.taskIdentifier]?.progress.completedUnitCount = tasks[dataTask.taskIdentifier]?.totalBytesRecieved ?? 0
+            
+            
+            if let progressBlock = tasks[dataTask.taskIdentifier]?.progressBlock,
+                let progress = tasks[dataTask.taskIdentifier]?.progress {
+                progressBlock(ProgressResponse(progress: progress))
+            }
         }
-        
     }
-    
-    
 }

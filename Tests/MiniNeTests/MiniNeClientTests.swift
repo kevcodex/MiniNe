@@ -12,11 +12,8 @@ final class MiniNeClientTests: XCTestCase {
         session = Tester()
         
         let configuration = URLSessionConfiguration.default
-        let session = URLSession(configuration: configuration,
-                                 delegate: self.session,
-                                 delegateQueue: nil)
         
-        client = MiniNeClient(session: session)
+        client = MiniNeClient(configuration: configuration, delegate: session)
     }
     
     func testBasicSuccessfulRequest() {
