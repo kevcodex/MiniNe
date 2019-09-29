@@ -16,7 +16,10 @@ class ViewController: UIViewController {
         let request = TestRequest()
         
         let client = MiniNeClient()
-        client.send(request: request) { (result) in
+        
+        client.send(request: request, progressBlock: { (progress) in
+            print(progress)
+        }) { (result) in
             switch result {
             case .success(let response):
                 let jsonDecoder = JSONDecoder()

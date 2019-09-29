@@ -8,10 +8,28 @@
 import Foundation
 import MiniNe
 
+class Tester: SessionDelegate {
+    var mockData: Data?
+    var mockURLResponse: URLResponse?
+    var mockError: Error?
+    
+    override func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        test?(mockData, mockURLResponse, mockError)
+    }
+}
+
 class MockURLSession: URLSession {
     var mockData: Data?
     var mockURLResponse: URLResponse?
     var mockError: Error?
+    
+    override var delegate: URLSessionDelegate? {
+        return SessionDelegate()
+    }
+    
+    override var configuration: URLSessionConfiguration {
+        return .default
+    }
     
     override func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         

@@ -10,18 +10,24 @@ import Foundation
 open class MiniNeClient {
     public static let defaultSession: URLSession = {
         let configuration = URLSessionConfiguration.default
-        let session = URLSession(configuration: configuration)
+        let session = URLSession(configuration: configuration,
+                                 delegate: SessionDelegate(),
+                                 delegateQueue: nil)
         return session
     }()
     
     public let session: URLSession
     
+    public weak var delegate: SessionDelegate?
+    
     public init(session: URLSession = defaultSession) {
         self.session = session
+        self.delegate = session.delegate as? SessionDelegate
     }
     
     /// Basic network request to return data.
     open func send<Request: NetworkRequest>(request: Request,
+                                            progressBlock: ((ProgressResponse) -> Void)? = nil,
                                             completion: @escaping (Result<Response, MiniNeError>) -> Void) {
         
         guard let urlRequest = request.buildURLRequest() else {
@@ -29,8 +35,11 @@ open class MiniNeClient {
             return
         }
         
-        let task = session.dataTask(with: urlRequest) {
-            data, response, error in
+        delegate?.progressBlock = progressBlock
+        
+        let task = session.dataTask(with: urlRequest)
+        
+        delegate?.test = { data, response, error in
             
             switch (data, response, error) {
                 
